@@ -103,7 +103,7 @@ def get_local_rfcs():
 # pass peer's hostname, port number and rfc_num, rfc_title
 def peer_information():
     keys = ["Title"]
-    rfcs_title = get_local_rfcs()  # ["title1", "title2", "title3"] we use rfcs_num to fill in title
+    rfcs_title = get_local_rfcs()
     rfcs_title = []
     for title in rfcs_title:
         entry = [title]
@@ -111,7 +111,7 @@ def peer_information():
     return [upload_port_num, dict_list_of_files]
 
 
-upload_port_num = 65000 + random.randint(1, 500)  # generate a upload port randomly in 65000~65500
+upload_port_num = 65000 + random.randint(1, 500)  # upload port: 65000~65500
 dict_list_of_files = []  # list of dictionaries of RFC numbers and Titles.
 s = socket.socket()
 host = "127.0.0.1"

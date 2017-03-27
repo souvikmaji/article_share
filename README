@@ -1,0 +1,11 @@
+A simple Napster-like file sharing system.
+Napster is first widely used service for ‘free’ peer-to-peer (P2P) music sharing. ArticleShare
+application will provide p2p article sharing which is very similar to Napster. Here are some high-level
+design requirements of this system.
+1. A centralized server keeps track of which clients store what files.
+2. A client informs the server as to what files are contained in its local repository, but does not actually transmit file-data to the server.
+3. When a client requires a file that does not belong to its repository, a request is sent to the server.
+The server identifies some other client who stores the requested file and sends its
+identity to the requesting client. The file is then directly fetched by the requesting client from
+the node that has a copy of the file without requiring any server intervention.
+4. Multiple clients could be downloading different files from a target client at a given point in time.
