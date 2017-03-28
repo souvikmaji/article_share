@@ -183,6 +183,7 @@ def client_thread(conn, addr):
             conn.send(new_data)
         else:
             # ADD
+            print(data)
             if data[0][0] == "A":
                 p2s_add_response(conn, data[1], data[2], data[3])  # Put server response message here
                 file_list = append_to_file_list(file_list, data[3], addr[0])

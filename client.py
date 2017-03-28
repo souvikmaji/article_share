@@ -11,20 +11,20 @@ def p2p_get_request(filename, peer_host, peer_upload_port):
     s.connect((peer_host, int(peer_upload_port)))
     data = p2p_request_message(filename, host)
     s.send(bytes(data, 'utf-8'))
-    data_rec = pickle.loads(s.recv(1024 * 100))
+    data_rec = pickle.loads(s.recv(1024))
     print("Data_rec", str(data_rec))
     status = data_rec[0].split()[0]
     if status == "200":
         current_path = os.getcwd()
         filename = current_path + "/" + filename
-        my_data = data_rec[1]
-        with open(filename, 'wb') as file:
-            file.write(my_data)
+        recv_file(s, filename)
+        # with open(filename, 'wb') as file:
+        #     file.write(my_data)
         with open(filename, 'rb') as file:
             text = file.read()
             print(text)
     else:
-        print("Data recieve failed")
+        print("Data receive failed")
     s.close()
 
 
@@ -38,7 +38,7 @@ def p2p_response_message(filename):
         txt = open(filename, "rb")
         data = txt.read()
         content_length = os.path.getsize(filename)
-        message = [status + " " + phrase + "\n" + "Content-Length: " + str(content_length) + "\n", data]
+        message = [status + " " + phrase + "\n" + "Content-Length: " + str(content_length) + "\n"]
     else:
         status = "404"
         phrase = "Not Found"
@@ -49,19 +49,21 @@ def p2p_response_message(filename):
 # send rfcs to peers
 def send_file(conn, filename):
     txt = open(filename, "rb")
-    data = txt.read(1024)
-    while data:
-        conn.send(data)
+    while True:
         data = txt.read(1024)
-    s.close()
+        if not data:
+            break
+        conn.send(data)
+    txt.close()
 
 
 def recv_file(conn, filename):
     txt = open(filename, "wb")
-    data = conn.recv(1024)
-    while data:
-        txt.write(data)
+    while True:
         data = conn.recv(1024)
+        txt.write(data)
+        if not data:
+            break
     txt.close()
 
 
@@ -189,8 +191,10 @@ def p2p_listen_thread(str, i):
         index2nd = data_p2p.index('H')
         filename = data_p2p[index1st + 2: index2nd - 1]  # get the filename
         print('Got connection from ', addr, " for file: ", filename)
-        c.send(pickle.dumps(p2p_response_message(filename)))
-
+        response_msg = p2p_response_message(filename)
+        c.send(pickle.dumps(response_msg))
+        if response_msg[0].split()[0] == "200":
+            send_file(c, filename)
         c.close()
 
 
